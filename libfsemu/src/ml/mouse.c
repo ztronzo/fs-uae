@@ -70,10 +70,24 @@ static void *manymouse_thread(void* data)
         return NULL;
     }
 
+    /* ManyMouse reads the mice even while the FS-UAE window is in the
+     * background (on Windows: raw input with RIDEV_INPUTSINK), and every move
+     * went to the Amiga - using another program moved the Amiga's pointer.
+     * Now moves, presses and scrolling are ignored while the window doesn't
+     * have the focus, unless mouse_background = 1. (Releasing a button always
+     * goes through, so no button is left held down.) */
+    int background = fs_config_get_boolean("mouse_background") == 1;
+    fs_log("[MANYMOUSE] Mice in the background: %s\n",
+           background ? "yes (mouse_background = 1)" : "no");
+
     ManyMouseEvent event;
     fs_ml_event *new_event;
     while (!fs_ml_is_quitting()) {
         while (ManyMouse_PollEvent(&event)) {
+            if (!background && !g_fs_ml_window_focused &&
+                    !(event.type == MANYMOUSE_EVENT_BUTTON && !event.value)) {
+                continue;
+            }
             if (event.type == MANYMOUSE_EVENT_RELMOTION) {
                 // printf("MANYMOUSE_EVENT_RELMOTION\n");
                 new_event = fs_ml_alloc_event();

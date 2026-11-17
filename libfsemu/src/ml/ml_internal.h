@@ -65,6 +65,8 @@ extern int g_fs_ml_vblank_sync;
 extern int g_fs_ml_benchmarking;
 
 extern int g_fs_ml_had_input_grab;
+/* 1 while the FS-UAE window has the keyboard focus (set on SDL window focus events) */
+extern volatile int g_fs_ml_window_focused;
 extern int g_fs_ml_was_fullscreen;
 
 #ifdef USE_SDL2
