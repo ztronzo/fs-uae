@@ -640,7 +640,8 @@ void fixup_prefs (struct uae_prefs *p)
 		error_log (_T("Genlock and A2024 or Graffiti can't be active simultaneously."));
 		p->genlock = false;
 	}
-	if (p->cs_hacks) {
+	/* AmigaLive: bit 0x100 is the AGA fine scroll setting (custom.cpp, BPLCON1): no warning for it */
+	if (p->cs_hacks & ~0x100) {
 		error_log (_T("chipset_hacks is nonzero (0x%04x)."), p->cs_hacks);
 	}
 
