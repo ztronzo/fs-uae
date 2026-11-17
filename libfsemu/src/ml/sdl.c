@@ -47,6 +47,7 @@
 SDL_Window *g_fs_ml_window = NULL;
 SDL_GLContext g_fs_ml_context = 0;
 int g_fs_ml_had_input_grab = 0;
+volatile int g_fs_ml_window_focused = 1;
 int g_fs_ml_was_fullscreen = 0;
 
 static GQueue *g_video_event_queue;
@@ -907,7 +908,10 @@ int fs_ml_event_loop(void)
             } else if (event.window.event == SDL_WINDOWEVENT_CLOSE) {
                 event.type = SDL_QUIT;
                 SDL_PushEvent(&event);
+            } else if (event.window.event == SDL_WINDOWEVENT_FOCUS_LOST) {
+                g_fs_ml_window_focused = 0;
             } else if (event.window.event == SDL_WINDOWEVENT_FOCUS_GAINED) {
+                g_fs_ml_window_focused = 1;
                 if (g_grab_input_on_activate) {
                     fs_log("Window focus gained - grabbing input\n");
                     g_grab_input_on_activate = false;
