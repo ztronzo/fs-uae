@@ -5348,6 +5348,15 @@ static void BPLCON1 (int hpos, uae_u16 v)
 {
 	if (!(currprefs.chipset_mask & CSMASK_AGA))
 		v &= 0xff;
+	/* AmigaLive: chipset_hacks bit 0x100 (uae_chipset_hacks = 0x100 in a game's
+	 * configuration) ignores the AGA quarter/half pixel fine scroll bits of BPLCON1
+	 * (PF1H0-H1 = bits 8-9, PF2H0-H1 = bits 12-13): this emulation core (WinUAE 3.3.0)
+	 * doesn't place them right in hires output, rows of the picture shift by a pixel
+	 * (fixed in WinUAE 4.1.0). Playfields then scroll in whole lores pixels. Display only:
+	 * BPLCON1 is write-only, the CPU never sees it (all players of an online game use the
+	 * same configuration, so collisions stay the same everywhere too). */
+	if (currprefs.cs_hacks & 0x100)
+		v &= ~0x3300;
 	if (bplcon1 == v)
 		return;
 	SET_LINE_CYCLEBASED;
